@@ -25,7 +25,7 @@ pipeline {
       steps {
         writeFile file: '.env', text: 'REACT_APP_BASE_URL=http://api:8080/api'
         sh 'docker build -t react-app .'
-        sh 'docker-compose up -d --build frontend'
+        sh 'docker run -d -p 3000:80 --name react-app react-app'
       }
     }
   }
