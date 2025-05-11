@@ -25,7 +25,7 @@ pipeline {
     stage('Docker') {
       steps {
         writeFile file: '.env', text: 'REACT_APP_BASE_URL=http://api:8080/api'
-        docker rm -f react-app || true
+        sh 'docker rm -f react-app || true'
         sh 'docker build -t react-app .'
         sh 'docker run -d -p 3000:80 --name react-app react-app'
       }
