@@ -8,7 +8,7 @@ pipeline {
         TAG        = "${BUILD_NUMBER}"
         NETWORK    = "products-net"
         PORT       = "3000"
-        API_URL    = "http://192.168.1.24:8080/api"   // одна адреса й для проксі
+        API_URL    = "http://93.175.206.119:8080/api"   // одна адреса й для проксі
     }
 
     stages {
