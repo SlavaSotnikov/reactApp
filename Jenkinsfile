@@ -9,9 +9,9 @@ pipeline {
     environment {
         IMAGE_NAME = "react-app"
         TAG        = "${BUILD_NUMBER}"
-        NETWORK    = "products-net"      // спільна мережа з API
+        NETWORK    = "products-net"
         PORT       = "3000"
-        API_URL    = "http://api:8080/api"
+        API_URL    = "http://192.168.1.24:8080/api"
     }
 
     stages {
