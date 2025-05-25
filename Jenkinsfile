@@ -1,9 +1,6 @@
-// Jenkinsfile for client
 pipeline {
     agent any
-
     tools { nodejs 'node18' }
-
     options { timestamps() }
 
     environment {
@@ -11,45 +8,48 @@ pipeline {
         TAG        = "${BUILD_NUMBER}"
         NETWORK    = "products-net"
         PORT       = "3000"
-        API_URL    = "http://192.168.1.24:8080/api"
+        API_URL    = "http://products-backend:80/api"   // одна адреса й для проксі
     }
 
     stages {
+
         stage('Checkout') {
-            steps { checkout scm }        // або git URL, якщо не Multibranch
+            steps { checkout scm }
         }
 
-        stage('Install deps') {
-            steps { sh 'npm ci --ignore-scripts' }
-        }
-
-        stage('Build') {
-            steps { sh "REACT_APP_BASE_URL=${API_URL} npm run build" }
-        }
+        /* 1️⃣: локальна npm-збірка більше не потрібна */
+        /*       CRA збирається усередині Dockerfile     */
 
         stage('Docker build & run') {
             steps {
-                script {
-                    // готуємо .env, якщо Dockerfile його копіює
-                    writeFile file: '.env', text: "REACT_APP_BASE_URL=${API_URL}\n"
+                sh """
+                   # створюємо .env, щоб CRA/Vite бачила змінну
+                   echo "REACT_APP_BASE_URL=${API_URL}" > .env
 
-                    sh """
-                      docker rm -f ${IMAGE_NAME} || true
-                      docker build -t ${IMAGE_NAME}:${TAG} -t ${IMAGE_NAME}:latest .
-                      docker run -d --name ${IMAGE_NAME} \\
-                        --network ${NETWORK} \\
-                        --restart unless-stopped \\
-                        -p ${PORT}:80 ${IMAGE_NAME}:latest
-                    """
-                }
+                   docker rm -f ${IMAGE_NAME} || true
+
+                   docker build \\
+                     --build-arg REACT_APP_BASE_URL=${API_URL} \\
+                     -t ${IMAGE_NAME}:${TAG} -t ${IMAGE_NAME}:latest .
+
+                   docker run -d --name ${IMAGE_NAME} \\
+                     --network ${NETWORK} \\
+                     --restart unless-stopped \\
+                     -p ${PORT}:80 ${IMAGE_NAME}:latest
+                """
+            }
+        }
+
+        /* 2️⃣: простий smoke-тест, що бекенд видно через проксі */
+        stage('Smoke test') {
+            steps {
+                sh "curl -sf http://localhost:${PORT}/api/products || (echo 'API not reachable' && exit 1)"
             }
         }
     }
 
     post {
         success { echo "✅ Frontend deployed on :${PORT}" }
-        failure { echo  "❌ Frontend build/deploy failed" }
-        always  { sh 'rm -rf build || true' }
+        failure { echo "❌ Frontend build/deploy failed" }
     }
 }
-
