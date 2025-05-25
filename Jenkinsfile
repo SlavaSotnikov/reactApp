@@ -8,7 +8,7 @@ pipeline {
         TAG        = "${BUILD_NUMBER}"
         NETWORK    = "products-net"
         PORT       = "3000"
-        API_URL    = "http://products-backend:80/api"   // одна адреса й для проксі
+        API_URL    = "http://192.168.1.24:8080/api"   // одна адреса й для проксі
     }
 
     stages {
@@ -43,7 +43,7 @@ pipeline {
         /* 2️⃣: простий smoke-тест, що бекенд видно через проксі */
         stage('Smoke test') {
             steps {
-                sh "curl -sf http://localhost:${PORT}/api/products || (echo 'API not reachable' && exit 1)"
+                sh "curl -sf http://192.168.1.24:${PORT}/api/products || (echo 'API not reachable' && exit 1)"
             }
         }
     }
