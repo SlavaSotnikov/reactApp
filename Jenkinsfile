@@ -1,35 +1,55 @@
 // Jenkinsfile for client
 pipeline {
-  agent any
+    agent any
 
-  tools {
-    nodejs "node18"
-  }
+    tools { nodejs 'node18' }
 
-  stages {
-    stage('Clone') {
-      steps {
-        git 'https://github.com/SlavaSotnikov/reactApp.git'
-      }
+    options { timestamps() }
+
+    environment {
+        IMAGE_NAME = "react-app"
+        TAG        = "${BUILD_NUMBER}"
+        NETWORK    = "products-net"      // спільна мережа з API
+        PORT       = "3000"
+        API_URL    = "http://api:8080/api"
     }
-    stage('Install') {
-      steps {
-        sh 'npm install'
-      }
+
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }        // або git URL, якщо не Multibranch
+        }
+
+        stage('Install deps') {
+            steps { sh 'npm ci --ignore-scripts' }
+        }
+
+        stage('Build') {
+            steps { sh "REACT_APP_BASE_URL=${API_URL} npm run build" }
+        }
+
+        stage('Docker build & run') {
+            steps {
+                script {
+                    // готуємо .env, якщо Dockerfile його копіює
+                    writeFile file: '.env', text: "REACT_APP_BASE_URL=${API_URL}\n"
+
+                    sh """
+                      docker rm -f ${IMAGE_NAME} || true
+                      docker build -t ${IMAGE_NAME}:${TAG} -t ${IMAGE_NAME}:latest .
+                      docker run -d --name ${IMAGE_NAME} \\
+                        --network ${NETWORK} \\
+                        --restart unless-stopped \\
+                        -p ${PORT}:80 ${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
     }
-    stage('Build') {
-      steps {
-        sh 'npm run build'
-      }
+
+    post {
+        success { echo "✅ Frontend deployed on :${PORT}" }
+        failure { echo  "❌ Frontend build/deploy failed" }
+        always  { sh 'rm -rf build || true' }
     }
-    stage('Docker') {
-      steps {
-        writeFile file: '.env', text: 'REACT_APP_BASE_URL=http://api:8080/api'
-        sh 'docker rm -f react-app || true'
-        sh 'docker build -t react-app .'
-        sh 'docker run -d -p 3000:80 --name react-app react-app'
-        sh 'docker image prune -f'
-      }
-    }
-  }
 }
+
