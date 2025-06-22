@@ -6,7 +6,7 @@ pipeline {
         sh """
           docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
           # якщо користуєтесь registry:
-          docker push react-app:latest
+          # docker push react-app:latest
         """
       }
     }
