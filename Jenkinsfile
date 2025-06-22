@@ -4,8 +4,7 @@ pipeline {
     stage('Build image') {
       steps {
         sh """
-          docker buildx create --name ci --use default || true
-          # docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
+          docker buildx build --load -t react-app:${BUILD_NUMBER} -t react-app:latest .
         """
       }
     }
