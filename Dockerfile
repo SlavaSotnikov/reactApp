@@ -10,7 +10,7 @@
 # FROM nginx:alpine
 # COPY --from=build /app/build /usr/share/nginx/html
 
-#################### 1. BUILD stage ####################
+#################### 1. BUILD stage ######################
 FROM node:18-alpine AS build
 WORKDIR /app
 
