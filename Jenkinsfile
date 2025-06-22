@@ -4,7 +4,8 @@ pipeline {
     stage('Build image') {
       steps {
         sh """
-          docker buildx build --tag react-app:${BUILD_NUMBER} --tag react-app:latest .
+          export DOCKER_BUILDKIT=1
+          docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
           # якщо користуєтесь registry:
           # docker push react-app:latest
         """
