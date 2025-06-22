@@ -5,9 +5,8 @@ pipeline {
       steps {
         sh """
           export DOCKER_BUILDKIT=1
+          export COMPOSE_DOCKER_CLI_BUILD=1
           docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
-          # якщо користуєтесь registry:
-          # docker push react-app:latest
         """
       }
     }
