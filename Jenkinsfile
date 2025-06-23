@@ -3,6 +3,18 @@ pipeline {
   stages {
     stage('Build image') {
       steps {
+        sh '''
+          echo "=== who/where ==="
+          whoami
+          hostname
+          which docker
+          docker version
+          echo "=== plugins visible to this process ==="
+          docker buildx version || echo "buildx NOT visible"
+          ls -l /usr/libexec/docker/cli-plugins || true
+          ls -l ~/.docker/cli-plugins || true
+        '''
+
         sh """
           export DOCKER_BUILDKIT=1
           docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
