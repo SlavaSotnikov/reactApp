@@ -4,10 +4,7 @@ pipeline {
     stage('Build image') {
       steps {
         sh """
-          docker buildx build --load \
-          --cache-from=type=registry,ref=registry.example.com/react-app:cache \
-          --cache-to=type=registry,ref=registry.example.com/react-app:cache,mode=max \
-          -t react-app:${BUILD_NUMBER} .
+          docker buildx build -t react-app:${BUILD_NUMBER} .
         """
       }
     }
