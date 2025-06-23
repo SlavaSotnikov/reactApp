@@ -4,21 +4,25 @@ pipeline {
     stage('Build image') {
       steps {
         sh '''
-          echo "=== who/where ==="
-          whoami
-          hostname
-          which docker
-          docker version
-          echo "=== plugins visible to this process ==="
-          docker buildx version || echo "buildx NOT visible"
-          ls -l /usr/libexec/docker/cli-plugins || true
-          ls -l ~/.docker/cli-plugins || true
-        '''
+                  set -e
+                  # Встановлюємо buildx, якщо його немає
+                  if ! docker buildx version >/dev/null 2>&1; then
+                    echo "--- installing buildx ---"
+                    apt-get update -qq
+                    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq docker-buildx-plugin
+                  fi
 
-        sh """
-          export DOCKER_BUILDKIT=1
-          docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
-        """
+                  # одноразово створюємо builder-контейнер і робимо його активним
+                  docker buildx create --name ci --driver docker-container --use || true
+
+                  # збірка + завантаження результату в локальний daemon
+                  docker buildx build --load -t react-app:${BUILD_NUMBER} -t react-app:latest .
+                '''
+
+        // sh """
+        //   export DOCKER_BUILDKIT=1
+        //   docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
+        // """
       }
     }
   }
