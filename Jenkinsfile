@@ -4,6 +4,7 @@ pipeline {
     stage('Build image') {
       steps {
         sh """
+          export DOCKER_BUILDKIT=1
           docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
         """
       }
