@@ -9,12 +9,12 @@ pipeline {
       }
     }
   }
-  // post {
-  //   success {
-  //     // тригер без очікування
-  //     build job: 'compose-pipeline', wait: false
-  //   }
-  // }
+  post {
+    success {
+      // тригер без очікування
+      build job: 'compose-pipeline', wait: false
+    }
+  }
 }
 
 
