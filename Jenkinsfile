@@ -3,36 +3,12 @@ pipeline {
   stages {
     stage('Build image') {
       steps {
-        sh '''
-                  apt-get update -qq && \
-                  apt-get install -y -qq ca-certificates curl gnupg
-                  
-                  # 1) ключ
-                  install -m 0755 -d /etc/apt/keyrings
-                  curl -fsSL https://download.docker.com/linux/$(. /etc/os-release && echo "$ID")/gpg \
-                       -o /etc/apt/keyrings/docker.asc
-                  chmod a+r /etc/apt/keyrings/docker.asc
-                  
-                  # 2) сам репозиторій
-                  echo \
-                    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] \
-                    https://download.docker.com/linux/$(. /etc/os-release && echo "$ID") \
-                    $(. /etc/os-release && echo ${VERSION_CODENAME:-$UBUNTU_CODENAME}) stable" \
-                    > /etc/apt/sources.list.d/docker.list
-                  
-                  apt-get update -qq
-                  
-                  # 3) потрібні пакети — досить лише CLI-плагінів
-                  apt-get install -y -qq docker-buildx-plugin docker-compose-plugin
-
-                  # збірка + завантаження результату в локальний daemon
-                  docker buildx build --load -t react-app:${BUILD_NUMBER} -t react-app:latest .
-                '''
-
-        // sh """
-        //   export DOCKER_BUILDKIT=1
-        //   docker build -t react-app:${BUILD_NUMBER} -t react-app:latest .
-        // """
+        sh """
+          docker buildx build --load \
+          --cache-from=type=registry,ref=registry.example.com/react-app:cache \
+          --cache-to=type=registry,ref=registry.example.com/react-app:cache,mode=max \
+          -t react-app:${BUILD_NUMBER} .
+        """
       }
     }
   }
