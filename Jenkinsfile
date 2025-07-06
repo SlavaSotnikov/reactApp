@@ -4,7 +4,7 @@ pipeline {
     stage('Build image') {
       steps {
         sh """
-          docker buildx build -t react-app:${BUILD_NUMBER} -t react-app:latest .
+          docker buildx build -t prod-client:${BUILD_NUMBER} -t prod-client:latest .
         """
       }
     }
