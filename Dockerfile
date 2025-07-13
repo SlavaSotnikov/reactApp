@@ -31,7 +31,7 @@ FROM nginx:1.25-alpine
 
 # ④ власний конфіг із проксі
 RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY client/nginx.conf /etc/nginx/conf.d/default.conf
 
 # ⑤ статичні файли
 COPY --from=build /app/build /usr/share/nginx/html
