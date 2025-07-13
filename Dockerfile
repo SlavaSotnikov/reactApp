@@ -18,7 +18,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --ignore-scripts   # швидше й детерміновано
 
-# ② копіюємо код + .env (з контексту)
+# ② копіюємо код + .env (з контексту) //
 COPY . .
 
 # ③ збірка. CRA/Vite читає REACT_APP_* із .env або ARG
