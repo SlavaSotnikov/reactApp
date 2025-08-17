@@ -6,7 +6,7 @@ In order to configure the base URL for connecting to the backend use .env file (
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts new
+## Available Scripts
 
 In the project directory, you can run:
 
