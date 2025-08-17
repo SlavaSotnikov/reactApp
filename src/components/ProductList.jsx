@@ -14,6 +14,7 @@ export function ProductList() {
 
   const getProducts = async () => {
     const products = await getProductsFromApi();
+    console.log("getProductsFromApi returned:", products);
     setProducts(products);
   };
 
