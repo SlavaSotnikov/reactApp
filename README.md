@@ -1,4 +1,4 @@
-# Description
+# Description new
 This project is the React frontend part of an educational  project, which demonstrates connection to the backend for obtaining data and performing CRUD operations on it.
 Before running the project ensure that the backend is running.
 In order to configure the base URL for connecting to the backend use .env file (variable `REACT_APP_BASE_URL`). In order to obtain a configuration file, rename the [.env.example](./.env.example) into `.env`. 
