@@ -5,12 +5,6 @@
       "title": "Product 1",
       "price": "19",
       "name": "Salt"
-    },
-    {
-      "id": 2,
-      "title": "Product 2",
-      "price": "33",
-      "name": "Sugar"
     }
   ]
 }
